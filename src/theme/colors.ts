@@ -1,0 +1,15 @@
+export default {
+  primary: '#FDB927',
+  secondary: 'black',
+  tertiary: '#545454',
+  white: '#FFFFFF',
+  transparent: 'rgba(0,0,0,0)',
+  light: '#e0e0e0',
+  label: 'grey',
+  buttonTitle: 'white',
+  disable: '#bdbdbd',
+  defaultBackground: '#fff',
+  error: 'red',
+  disabledButton: '#ffffff',
+  disabledButtonTitle: 'grey',
+};
