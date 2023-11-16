@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import storage from '@app/utils/storage';
 
 const useGetCartId = () => {
@@ -16,7 +15,7 @@ const useGetCartId = () => {
           setCartId(null);
         }
       } catch (error) {
-        console.error('AsyncStorage Error', error);
+        console.error('Storage Error', error);
         setError('Failed to retrieve cart id from storage.');
       }
     };

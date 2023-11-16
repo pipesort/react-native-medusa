@@ -5,18 +5,18 @@
  * @format
  */
 
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import {
   CardStyleInterpolators,
   createStackNavigator,
 } from '@react-navigation/stack';
 import SCREENS from './Screens';
 import React from 'react';
-import {Platform} from 'react-native';
-import {LastSelectedProductSizeProvider} from '@app/components/LastSelectedProductSizeProvider';
+import { Platform } from 'react-native';
+import { LastSelectedProductSizeProvider } from '@app/components/LastSelectedProductSizeProvider';
 
 import Product from '@app/screens/Product';
-import {IOSBackButton, AndroidBackButton} from '@app/components/BackButton';
+import { IOSBackButton, AndroidBackButton } from '@app/components/BackButton';
 import Login from '@app/screens/Login';
 import SignUp from '@app/screens/SignUp';
 import InitialScreen from '@app/screens/InitialScreen';
@@ -25,7 +25,6 @@ import colors from '@app/theme/colors';
 import fonts from '@app/theme/fonts';
 import NewShippingAddress from '@app/screens/NewShippingAddress';
 import Checkout from '@app/screens/Checkout';
-import {StripeProvider} from '@stripe/stripe-react-native';
 
 import HighestPriceProducts from '@app/screens/HighestPriceProducts';
 import LowestPriceProducts from '@app/screens/LowestPriceProducts';
@@ -40,7 +39,7 @@ const generalScreenOptions = {
 export const screenOptionsWithCustomBackBtn = Platform.select({
   ios: {
     ...generalScreenOptions,
-    headerLeft: ({onPress}) => (
+    headerLeft: ({ onPress }) => (
       <IOSBackButton onPress={onPress} title={undefined} />
     ),
     headerTitleStyle: {
@@ -90,7 +89,7 @@ function App(): JSX.Element {
               headerShown: true,
               headerTitle: '',
               headerBackTitle: '',
-              headerLeft: ({onPress}) =>
+              headerLeft: ({ onPress }) =>
                 Platform.OS === 'ios' ? (
                   <IOSBackButton onPress={onPress} title={undefined} />
                 ) : (
@@ -131,29 +130,13 @@ function App(): JSX.Element {
           <Stack.Screen
             name={SCREENS.NEW_SHIPPING_ADDRESS}
             component={NewShippingAddress}
-            // options={{
-            //   cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            //   headerShown: Platform.OS === "ios" ? true : false,
-            //   headerTitle: "Shipping Address",
-            //   headerBackTitle: "",
-            //   headerLeft: (props) => {
-            //     return <IOSBackButton onPress={props.onPress} />;
-            //   },
-            // }}
+          
             options={screenOptionsWithCustomBackBtn}
           />
           <Stack.Screen
             name={SCREENS.CHECKOUT}
             component={Checkout}
-            // options={{
-            //   cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-            //   headerShown: Platform.OS === "ios" ? true : false,
-            //   headerTitle: "Shipping Address",
-            //   headerBackTitle: "",
-            //   headerLeft: (props) => {
-            //     return <IOSBackButton onPress={props.onPress} />;
-            //   },
-            // }}
+       
             options={screenOptionsWithCustomBackBtn}
           />
           <Stack.Screen

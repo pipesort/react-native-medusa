@@ -118,7 +118,7 @@ const SignUp = ({ navigation, route }) => {
           }
           return navigation.navigate(SCREENS.BOTTOM_TAB_NAVIGATOR);
         } catch (error) {
-          console.error('AsyncStorage error:', error);
+          console.error('Storage error:', error);
         }
       }
     };

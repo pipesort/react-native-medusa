@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import { BASE_URL } from '@app/constants/url';
 import useGetCustomerAccessToken from './useGetCustomerAccessToken';
 

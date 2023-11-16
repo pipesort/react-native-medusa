@@ -17,7 +17,7 @@ const useGetCustomerAccessToken = () => {
           setCustomerAccessToken(null);
         }
       } catch (error) {
-        console.error('AsyncStorage Error', error);
+        console.error('Storage Error', error);
         setError('Failed to retrieve token from storage.');
       } finally {
         setIsLoading(false); // Set loading to false regardless of outcome

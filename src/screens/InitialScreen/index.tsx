@@ -9,7 +9,7 @@ import {
   ImageBackground,
   Alert,
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import useGetCustomerAccessToken from '@app/hooks/useGetCustomerAccessToken';

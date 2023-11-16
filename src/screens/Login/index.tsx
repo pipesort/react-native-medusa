@@ -98,7 +98,6 @@ const Login = ({ navigation, route }) => {
         return response.json();
       })
       .then((data) => {
-        // AsyncStorage.setItem('cart_id', data.cart.id);
         storage.set('cart_id', data.cart.id);
       })
       .catch((error) => {

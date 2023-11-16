@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
+
 import { BASE_URL } from '@app/constants/url';
 import storage from '@app/utils/storage';
 
@@ -12,7 +12,7 @@ const useGetCustomerData = () => {
   useEffect(() => {
     const getCustomerAccessToken = async () => {
       try {
-        // const token = await AsyncStorage.getItem('jwt_token');
+
         const token = storage.getString('jwt_token');
         if (token) {
           setCustomerAccessToken(token);
@@ -20,7 +20,7 @@ const useGetCustomerData = () => {
           setCustomerAccessToken(null);
         }
       } catch (error) {
-        console.error('AsyncStorage Error', error);
+        console.error('Storage Error', error);
         setError('Failed to retrieve token from storage.');
       }
     };

@@ -180,7 +180,6 @@ export default function Checkout({ cart, navigation }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            // provider_id: 'stripe',
             provider_id: 'manual',
           }),
         }),

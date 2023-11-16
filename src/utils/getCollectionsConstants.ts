@@ -10,8 +10,7 @@ const getCollectionsConstants = ({ route }) => {
 
   if (
     route?.name &&
-    (route.name === SCREENS.MOST_POPULAR ||
-      route.name === SCREENS.NEW ||
+    (route.name === SCREENS.NEW ||
       route.name === SCREENS.HIGHEST_PRICE_PRODUCTS ||
       route.name === SCREENS.LOWEST_PRICE_PRODUCTS)
   ) {

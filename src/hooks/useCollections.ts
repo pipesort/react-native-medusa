@@ -68,7 +68,7 @@ export const useCollections = ({ initialLimit = 5, screenName }) => {
           initialLimit + 3
         }&offset=${offset}&order=variants.prices.amount`;
       case SCREENS.HIGHEST_PRICE_PRODUCTS:
-        // return `${BASE_URL}/store/products?limit=${initialLimit}&offset=${offset}&order=-variants.prices.amount`;
+        // return `${BASE_URL}/store/products?limit=${initialLimit}&offset=${offset}&order=-variants.prices.amount`; 
         return `${BASE_URL}/store/products?limit=${initialLimit}&offset=${offset}`;
       default:
         return `${BASE_URL}/store/products?limit=${initialLimit}&offset=${offset}`;
@@ -104,6 +104,8 @@ export const useCollections = ({ initialLimit = 5, screenName }) => {
       loadProducts();
     }
   }, [loadProducts]);
+
+  console.log("offset",offset)
 
   return {
     collection,
