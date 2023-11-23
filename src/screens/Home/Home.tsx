@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useState} from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -7,9 +7,9 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import isEmpty from 'lodash/isEmpty';
-import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 
@@ -18,6 +18,7 @@ import LogoImg from '@app/assets/images/top_bar.png';
 import SCREENS from '../../../Screens';
 import Section from './Section';
 import styles from './styles';
+import CURRENCY_CODE from '@app/utils/currency';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const Home = ({
@@ -30,7 +31,7 @@ const Home = ({
 }: any) => {
   const navigateTo = (index: any) => {
     navigation.navigate(SCREENS.PRODUCT, {
-      product: {id: productIds[index]},
+      product: { id: productIds[index] },
     });
   };
 
@@ -56,15 +57,15 @@ const Home = ({
     if (collection && collection.products) {
       // Sort by lowest price
       const sortedByLowestPrice = [...collection.products].sort((a, b) => {
-        const lowestPriceA = getLowestPrice(a.variants);
-        const lowestPriceB = getLowestPrice(b.variants);
+        const lowestPriceA = getLowestPrice(a.variants, CURRENCY_CODE);
+        const lowestPriceB = getLowestPrice(b.variants, CURRENCY_CODE);
         return lowestPriceA - lowestPriceB; // For ascending order
       });
 
       // Sort by highest price
       const sortedByHighestPrice = [...collection.products].sort((a, b) => {
-        const highestPriceA = getHighestPrice(a.variants);
-        const highestPriceB = getHighestPrice(b.variants);
+        const highestPriceA = getHighestPrice(a.variants, CURRENCY_CODE);
+        const highestPriceB = getHighestPrice(b.variants, CURRENCY_CODE);
         return highestPriceB - highestPriceA; // For descending order
       });
 
@@ -72,27 +73,54 @@ const Home = ({
       setProductsSortedByHighestPrice(sortedByHighestPrice);
     }
   }, [collection]);
+  const getLowestPrice = (variants: any, currencyCode: string) => {
+    let lowest = null;
 
-  const getLowestPrice = (variants: any) => {
-    return variants.reduce((lowest: any, variant: any) => {
-      const lowestVariantPrice = Math.min(
-        ...variant.prices.map(price => price.amount),
+    variants.forEach((variant) => {
+      // Filter the prices for the current variant based on the specified currency code
+      const filteredPrices = variant.prices.filter(
+        (price) => price.currency_code === currencyCode,
       );
-      return lowest === null
-        ? lowestVariantPrice
-        : Math.min(lowest, lowestVariantPrice);
-    }, null);
+
+      if (filteredPrices.length > 0) {
+        // Find the lowest price for the current variant
+        const lowestVariantPrice = Math.min(
+          ...filteredPrices.map((price) => price.amount),
+        );
+
+        // Update the overall lowest price if necessary
+        if (lowest === null || lowestVariantPrice < lowest) {
+          lowest = lowestVariantPrice;
+        }
+      }
+    });
+
+    return lowest;
   };
 
-  const getHighestPrice = (variants: any) => {
-    return variants.reduce((highest: any, variant: any) => {
-      const highestVariantPrice = Math.max(
-        ...variant.prices.map(price => price.amount),
+  const getHighestPrice = (variants: any, currencyCode: string) => {
+    let highest = null;
+
+    variants.forEach((variant) => {
+      // Filter the prices for the current variant based on the specified currency code
+      const filteredPrices = variant.prices.filter(
+        (price) => price.currency_code === currencyCode,
       );
-      return highest === null
-        ? highestVariantPrice
-        : Math.max(highest, highestVariantPrice);
-    }, null);
+
+      if (filteredPrices.length > 0) {
+        // Find the highest price for the current variant
+        const highestVariantPrice = Math.max(
+          ...filteredPrices.map((price) => price.amount),
+        );
+
+        // Update the overall highest price if necessary
+        if (highest === null || highestVariantPrice > highest) {
+          highest = highestVariantPrice;
+        }
+      }
+    });
+
+    return highest;
   };
 
   return (
@@ -120,13 +148,15 @@ const Home = ({
               showPagination
               index={0}
               paginationActiveColor="black"
-              paginationStyleItem={styles.dotStyle}>
+              paginationStyleItem={styles.dotStyle}
+            >
               {images.map((image: any, index: any) => (
                 <TouchableOpacity
                   style={styles.slideImageView}
                   key={index}
-                  onPress={() => navigateTo(index)}>
-                  <Image source={{uri: image}} style={styles.carouselImage} />
+                  onPress={() => navigateTo(index)}
+                >
+                  <Image source={{ uri: image }} style={styles.carouselImage} />
                 </TouchableOpacity>
               ))}
             </SwiperFlatList>

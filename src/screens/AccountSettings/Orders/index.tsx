@@ -21,8 +21,6 @@ const OrdersHistory = ({ navigation }) => {
       price: order.total,
     }));
 
-  // const getCondition = condition => condition.toUpperCase();
-
   return (
     <View style={styles.container}>
       {loading ? (
@@ -59,7 +57,7 @@ const OrdersHistory = ({ navigation }) => {
                     <Text style={styles.orderDescription}>
                       PRICE:
                       <Text style={styles.productDescription}>
-                        $ {node.price}
+                        $ {(node.price / 100).toFixed(2)}
                       </Text>
                     </Text>
                   </View>

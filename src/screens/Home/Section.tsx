@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import {createShimmerPlaceholder} from 'react-native-shimmer-placeholder';
+import { createShimmerPlaceholder } from 'react-native-shimmer-placeholder';
 import LinearGradient from 'react-native-linear-gradient';
 
 import SCREENS from '../../../Screens';
@@ -13,6 +13,7 @@ import Skeleton from './Skeleton';
 import SectionTitle from './SectionTitle';
 
 import styles from './styles';
+import CURRENCY_CODE from '@app/utils/currency';
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
@@ -27,19 +28,28 @@ const Section = ({
 }: any) => {
   const [imgVisible, setImgVisible] = useState(false);
   const products = collection;
-
-  const getLowestPriceVariant = variants => {
+  const getLowestPriceVariant = (variants) => {
     return variants.reduce((lowest, variant) => {
-      const variantLowestPrice = variant.prices.reduce((prev, current) => {
-        return prev.amount < current.amount ? prev : current;
-      });
+      const selectedCurrencyPrice = variant.prices.filter(
+        (price) => price.currency_code === CURRENCY_CODE,
+      );
+
+      if (selectedCurrencyPrice.length === 0) {
+        return lowest;
+      }
+
+      const variantLowestPrice = selectedCurrencyPrice.reduce(
+        (prev, current) => {
+          return prev.amount < current.amount ? prev : current;
+        },
+      );
+
       return !lowest || variantLowestPrice.amount < lowest.amount
         ? variantLowestPrice
         : lowest;
     }, null);
   };
 
-  // Utility function to get the price in a formatted string
   const getFormattedPrice = (variants: any, currencyCode: any) => {
     const lowestPriceVariant = getLowestPriceVariant(variants);
     if (!lowestPriceVariant) {
@@ -49,9 +59,6 @@ const Section = ({
     const price = (lowestPriceVariant.amount / 100).toFixed(2); // Converts to a decimal with two digits
     return `$ ${price}`;
   };
-
-  // Constant for the currency code
-  const CURRENCY_CODE = 'usd';
 
   return (
     <>
@@ -69,7 +76,8 @@ const Section = ({
           <ScrollView
             style={styles.imageContainer}
             horizontal
-            showsHorizontalScrollIndicator={false}>
+            showsHorizontalScrollIndicator={false}
+          >
             {products &&
               products.map((product: any, index: any) => (
                 <View
@@ -77,7 +85,8 @@ const Section = ({
                     ...styles.imageView,
                     marginLeft: index === 0 ? wp('7.71%') : 0,
                   }}
-                  key={index}>
+                  key={index}
+                >
                   <TouchableOpacity
                     onPress={() =>
                       navigation.navigate(SCREENS.PRODUCT, {
@@ -85,16 +94,18 @@ const Section = ({
                           ...product,
                         },
                       })
-                    }>
+                    }
+                  >
                     <ShimmerPlaceholder
                       width={wp('43.7%')}
                       height={hp('16%')}
                       shimmerStyle={{
                         marginBottom: hp('4%'),
                       }}
-                      visible={imgVisible}>
+                      visible={imgVisible}
+                    >
                       <FastImage
-                        source={{uri: product.images[0].url}}
+                        source={{ uri: product.images[0].url }}
                         resizeMode="contain"
                         style={styles.image}
                         onLoadEnd={() => setImgVisible(true)}

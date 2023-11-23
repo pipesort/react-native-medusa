@@ -31,6 +31,8 @@ import LowestPriceProducts from '@app/screens/LowestPriceProducts';
 import OrdersHistory from '@app/screens/AccountSettings/Orders';
 import NewProducts from '@app/screens/NewProducts';
 import BottomTabNavigator from '@app/BottomTabNavigator';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { STRIPE_PUBLISHABLE_KEY } from '@env';
 
 const generalScreenOptions = {
   cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
@@ -70,98 +72,98 @@ function App(): JSX.Element {
   const Stack = createStackNavigator();
 
   return (
-    <LastSelectedProductSizeProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName={SCREENS.INITIAL}>
-          <Stack.Screen
-            name={SCREENS.BOTTOM_TAB_NAVIGATOR}
-            component={BottomTabNavigator}
-            options={{
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name={SCREENS.PRODUCT}
-            component={Product}
-            options={{
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              headerShown: true,
-              headerTitle: '',
-              headerBackTitle: '',
-              headerLeft: ({ onPress }) =>
-                Platform.OS === 'ios' ? (
-                  <IOSBackButton onPress={onPress} title={undefined} />
-                ) : (
-                  <AndroidBackButton onPress={onPress} title={undefined} />
-                ),
-              // headerShown: false
-            }}
-          />
-          <Stack.Screen
-            name={SCREENS.SIGNUP}
-            component={SignUp}
-            options={{
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name={SCREENS.LOGIN}
-            component={Login}
-            options={{
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name={SCREENS.INITIAL}
-            component={InitialScreen}
-            options={{
-              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name={SCREENS.SHIPPING_ADDRESS_DETAILS}
-            component={ShippingAddressDetails}
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.NEW_SHIPPING_ADDRESS}
-            component={NewShippingAddress}
-          
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.CHECKOUT}
-            component={Checkout}
-       
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.ORDERS_HISTORY}
-            component={OrdersHistory}
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.LOWEST_PRICE_PRODUCTS}
-            component={LowestPriceProducts}
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.HIGHEST_PRICE_PRODUCTS}
-            component={HighestPriceProducts}
-            options={screenOptionsWithCustomBackBtn}
-          />
-          <Stack.Screen
-            name={SCREENS.NEW}
-            component={NewProducts}
-            options={screenOptionsWithCustomBackBtn}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </LastSelectedProductSizeProvider>
+    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+      <LastSelectedProductSizeProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName={SCREENS.INITIAL}>
+            <Stack.Screen
+              name={SCREENS.BOTTOM_TAB_NAVIGATOR}
+              component={BottomTabNavigator}
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name={SCREENS.PRODUCT}
+              component={Product}
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerShown: true,
+                headerTitle: '',
+                headerBackTitle: '',
+                headerLeft: ({ onPress }) =>
+                  Platform.OS === 'ios' ? (
+                    <IOSBackButton onPress={onPress} title={undefined} />
+                  ) : (
+                    <AndroidBackButton onPress={onPress} title={undefined} />
+                  ),
+                // headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name={SCREENS.SIGNUP}
+              component={SignUp}
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name={SCREENS.LOGIN}
+              component={Login}
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name={SCREENS.INITIAL}
+              component={InitialScreen}
+              options={{
+                cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name={SCREENS.SHIPPING_ADDRESS_DETAILS}
+              component={ShippingAddressDetails}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.NEW_SHIPPING_ADDRESS}
+              component={NewShippingAddress}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.CHECKOUT}
+              component={Checkout}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.ORDERS_HISTORY}
+              component={OrdersHistory}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.LOWEST_PRICE_PRODUCTS}
+              component={LowestPriceProducts}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.HIGHEST_PRICE_PRODUCTS}
+              component={HighestPriceProducts}
+              options={screenOptionsWithCustomBackBtn}
+            />
+            <Stack.Screen
+              name={SCREENS.NEW}
+              component={NewProducts}
+              options={screenOptionsWithCustomBackBtn}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </LastSelectedProductSizeProvider>
+    </StripeProvider>
   );
 }
 

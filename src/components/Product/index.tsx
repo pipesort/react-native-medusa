@@ -1,21 +1,33 @@
 /* eslint-disable radix */
 import React from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 import ImagePlaceHolder from '@app/components/ImagePlaceholder';
 
 import SCREENS from '../../../Screens';
 
 import styles from './styles';
+import CURRENCY_CODE from '@app/utils/currency';
 
-const Product = ({item, navigation, type = 'Collection'}) => {
+const Product = ({ item, navigation, type = 'Collection' }) => {
   let priceToShow = '';
 
-  const getLowestPriceVariant = variants => {
+  const getLowestPriceVariant = (variants) => {
     return variants.reduce((lowest, variant) => {
-      const variantLowestPrice = variant.prices.reduce((prev, current) => {
-        return prev.amount < current.amount ? prev : current;
-      });
+      const selectedCurrencyPrice = variant.prices.filter(
+        (price) => price.currency_code === CURRENCY_CODE,
+      );
+
+      if (selectedCurrencyPrice.length === 0) {
+        return lowest;
+      }
+
+      const variantLowestPrice = selectedCurrencyPrice.reduce(
+        (prev, current) => {
+          return prev.amount < current.amount ? prev : current;
+        },
+      );
+
       return !lowest || variantLowestPrice.amount < lowest.amount
         ? variantLowestPrice
         : lowest;
@@ -33,17 +45,15 @@ const Product = ({item, navigation, type = 'Collection'}) => {
     return `$ ${price}`;
   };
 
-  // Constant for the currency code
-  const CURRENCY_CODE = 'usd';
-
   return (
     <View style={styles.product}>
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(SCREENS.PRODUCT, {
-            product: {...item},
+            product: { ...item },
           })
-        }>
+        }
+      >
         <View style={styles.imageWrapper}>
           <ImagePlaceHolder src={item.thumbnail} />
         </View>

@@ -10,15 +10,16 @@ import useGetCustomerAccessToken from '@app/hooks/useGetCustomerAccessToken';
 import storage from '@app/utils/storage';
 import SCREENS from '../../../Screens';
 import styles from './styles';
+import { CardField, confirmPayment } from '@stripe/stripe-react-native';
 
-export default function Checkout({ cart, navigation }) {
+export default function Checkout({ navigation }) {
   const [shippingAddress, setShippingAddress] = useState({});
   const [shippingOptions, setShippingOptions] = useState([]);
   const [selectedShippingOption, setSelectedShippingOption] = useState('');
   const [selectedShippingAddressOption, setSelectedShippingAddressOption] =
     useState('');
 
-  const { data, loading, error, refetch } = useGetCustomerData();
+  const { data } = useGetCustomerData();
   const { customerAccessToken } = useGetCustomerAccessToken();
 
   useEffect(() => {
@@ -26,6 +27,13 @@ export default function Checkout({ cart, navigation }) {
       setShippingAddress(data.customer?.shipping_addresses);
     }
   }, [data]);
+
+  const [paymentInfo, setPaymentInfo] = useState({});
+  const [paymentSession, setPaymentSession] = useState({});
+
+  const handlePaymentInputChange = (card) => {
+    setPaymentInfo(card);
+  };
 
   const completeCart = async () => {
     try {
@@ -60,6 +68,42 @@ export default function Checkout({ cart, navigation }) {
       console.error('Error completing cart:', error);
     }
   };
+  const handlePayment = async () => {
+    // Getting client secret from the payment session state
+    const clientSecret = paymentSession.data
+      ? paymentSession.data.client_secret
+      : paymentSession.client_secret;
+
+    const billingDetails = {
+      email: data.customer.email,
+      phone: selectedShippingAddressOption.phone,
+      name:
+        selectedShippingAddressOption.first_name +
+        selectedShippingAddressOption.last_name,
+      address: {
+        city: selectedShippingAddressOption.city,
+        country: selectedShippingAddressOption.country_code,
+        line1: selectedShippingAddressOption.address_1,
+        line2: selectedShippingAddressOption.address_2,
+        postal_code: selectedShippingAddressOption.postal_code,
+      },
+    };
+    const { error, paymentIntent } = await confirmPayment(clientSecret, {
+      paymentMethodType: 'Card',
+      paymentMethodData: {
+        billingDetails,
+      },
+    });
+    if (error) {
+      console.log(error);
+      Alert.alert('Payment failed', error);
+    }
+    if (paymentIntent) {
+      Alert.alert('Payment successful');
+      // Calling the complete cart function to empty the cart and redirect to the home screen
+      completeCart();
+    }
+  };
 
   const placeOrder = async () => {
     const cart_id = await storage.getString('cart_id');
@@ -89,6 +133,15 @@ export default function Checkout({ cart, navigation }) {
       postal_code,
       phone,
     };
+    const selectedOption = getShippingOptionDetails(selectedShippingOption);
+    if (selectedOption) {
+      Alert.alert(
+        'Order Confirmation',
+        `The shipping cost of $${selectedOption.amount / 100} for ${
+          selectedOption.name
+        } has been added to your order.`,
+      );
+    }
 
     fetch(`${BASE_URL}/store/carts/${cart_id}`, {
       method: 'POST',
@@ -131,7 +184,8 @@ export default function Checkout({ cart, navigation }) {
         return response.json();
       })
       .then(() => {
-        completeCart();
+        // completeCart();
+        handlePayment();
       })
       .catch((error) => {
         console.error('Error placing order:', error);
@@ -159,8 +213,10 @@ export default function Checkout({ cart, navigation }) {
   };
 
   const InitializePaymentSessions = async () => {
+    // Getting cart id from storage
     const cart_id = storage.getString('cart_id');
 
+    // Initializing payment session
     fetch(`${BASE_URL}/store/carts/${cart_id}/payment-sessions`, {
       method: 'POST',
       headers: {
@@ -169,36 +225,41 @@ export default function Checkout({ cart, navigation }) {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then(() =>
-        fetch(`${BASE_URL}/store/carts/${cart_id}/payment-session`, {
+      .then(() => {
+        return fetch(`${BASE_URL}/store/carts/${cart_id}/payment-session`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            provider_id: 'manual',
-          }),
-        }),
-      )
+          body: JSON.stringify({ provider_id: 'stripe' }),
+        });
+      })
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
       })
-      .then((data) => {})
+      .then((data) => {
+        console.log('data =>', data.cart.payment_session);
+        setPaymentSession(data.cart.payment_session);
+      })
       .catch((error) => {
-        console.error('Error initializing payment sessions:', error);
+        console.error('There was an error!', error);
       });
   };
 
   useEffect(() => {
     fetchPaymentOption();
   }, []);
+  const getShippingOptionDetails = (optionId) => {
+    return shippingOptions.find((option) => option.id === optionId);
+  };
+  console.log('shhh', shippingOptions);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -260,20 +321,53 @@ export default function Checkout({ cart, navigation }) {
           )}
         </View>
 
-        <View style={styles.payment} />
         <View style={styles.shipping}>
           <Text style={styles.title}>Shipping Options</Text>
           {shippingOptions.map((option) => (
             <View style={styles.shippingOption} key={option.id}>
               <RadioButton
-                onPress={() => setSelectedShippingOption(option.id)}
+                onPress={() => {
+                  setSelectedShippingOption(option.id);
+                  const selectedOption = getShippingOptionDetails(option.id);
+                  if (selectedOption) {
+                    Alert.alert(
+                      'Selected Shipping Option',
+                      `Name: ${selectedOption.name}, Charge: $${
+                        selectedOption.amount / 100
+                      }`, // Assuming the amount is in cents
+                    );
+                  }
+                }}
                 key={option.id}
                 selected={selectedShippingOption === option.id}
                 children={option.name}
               />
             </View>
           ))}
-
+          <View style={styles.payment}>
+            <Text style={styles.title}>Payment</Text>
+            <CardField
+              postalCodeEnabled={false}
+              placeholders={{
+                number: '4242 4242 4242 4242',
+              }}
+              cardStyle={{
+                backgroundColor: '#FFFFFF',
+                textColor: '#000000',
+              }}
+              style={{
+                width: '100%',
+                height: 50,
+                marginVertical: 30,
+              }}
+              onCardChange={(cardDetails) => {
+                handlePaymentInputChange(cardDetails);
+              }}
+              onFocus={(focusedField) => {
+                console.log('focusField', focusedField);
+              }}
+            />
+          </View>
           <Button
             onPress={placeOrder}
             large
